@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Produced by Beyond Compare 4 from Scooter Software -->
+<BCState Version="1" MinVersion="1">
+	<TBcState>
+		<FirstStartup Value="False"/>
+		<FormPositions>
+			<TViewFrame Value="554;149;1352;696;3"/>
+		</FormPositions>
+	</TBcState>
+	<TDirCompareState>
+		<LeftMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\sonoflink"/>
+			<_1 Value="D:\Workspace\Projects\Unity\sonoflink\Assets"/>
+			<_2 Value="D:\Workspace\Projects\Unity"/>
+			<_3 Value="D:\Workspace\Projects"/>
+			<_4 Value="D:\Workspace"/>
+			<_5 Value="D:\"/>
+		</LeftMRUSpecs>
+		<LogHeight Value="0"/>
+		<MRUFilters>
+			<_0 Value="-.\DataPath\;-.\Library\;-.\LuaEncoder\;-.\luaProject\;-.\obj\;-.\Temp\"/>
+		</MRUFilters>
+		<RightMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets"/>
+			<_1 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK"/>
+		</RightMRUSpecs>
+		<ShowToolbar Value="False"/>
+	</TDirCompareState>
+	<THomeState>
+		<SessionType Value="TDirCompareSession"/>
+	</THomeState>
+	<TTextCompareState>
+		<LeftMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Prefabs\Main\UI\MainPanel.prefab"/>
+			<_1 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Poke\Scripts\Main.cs"/>
+			<_2 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Poke\Scripts\Manager\ResourceManager.cs"/>
+			<_3 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Poke\Lua\Main\Logic\GameManager.lua"/>
+			<_4 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Poke\Lua\Main\Logic\UI\View\MainPanel.lua"/>
+			<_5 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Poke\Lua\Main\Common\define.lua"/>
+			<_6 Value="D:\Workspace\Projects\Unity\sonoflink\ProjectSettings\ProjectSettings.asset"/>
+			<_7 Value="D:\Workspace\Projects\Unity\sonoflink\ProjectSettings\GraphicsSettings.asset"/>
+			<_8 Value="D:\Workspace\Projects\Unity\sonoflink\Assets\Prefabs\Main\ShareSDK\ShareSDK.prefab"/>
+		</LeftMRUSpecs>
+		<MRUFonts>
+			<_0 Value="Consolas;10"/>
+		</MRUFonts>
+		<RightMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Prefabs\Main\UI\MainPanel.prefab"/>
+			<_1 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Poke\Scripts\Main.cs"/>
+			<_2 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Poke\Scripts\Manager\ResourceManager.cs"/>
+			<_3 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Poke\Lua\Main\Logic\GameManager.lua"/>
+			<_4 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Poke\Lua\Main\Logic\UI\View\MainPanel.lua"/>
+			<_5 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Poke\Lua\Main\Common\define.lua"/>
+			<_6 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\ProjectSettings\ProjectSettings.asset"/>
+			<_7 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\ProjectSettings\GraphicsSettings.asset"/>
+			<_8 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets\Prefabs\Main\ShareSDK\ShareSDK.prefab"/>
+		</RightMRUSpecs>
+	</TTextCompareState>
+	<TTextFindState>
+		<FindItems>
+			<_0 Value="OnClickShareButton"/>
+		</FindItems>
+		<ReplaceItems>
+			<_0/>
+		</ReplaceItems>
+	</TTextFindState>
+</BCState>

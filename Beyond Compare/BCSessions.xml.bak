@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Produced by Beyond Compare 4 from Scooter Software -->
+<BCSessions Version="1" MinVersion="1">
+	<TSessionFolder>
+		<Items>
+			<TSessionFolder>
+				<Items>
+					<TDirCompareSession Value="sonoflink &lt;--> Assets">
+						<LastModified Value="2017-04-11 15:57:02"/>
+						<Specs>
+							<Left Value="D:\Workspace\Projects\Unity\sonoflink"/>
+							<Right Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets"/>
+						</Specs>
+					</TDirCompareSession>
+				</Items>
+			</TSessionFolder>
+		</Items>
+	</TSessionFolder>
+</BCSessions>

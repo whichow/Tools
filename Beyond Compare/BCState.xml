@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Produced by Beyond Compare 4 from Scooter Software -->
+<BCState Version="1" MinVersion="1">
+	<TBcState>
+		<FirstStartup Value="False"/>
+		<FormPositions>
+			<TViewFrame Value="441;159;1239;706;3"/>
+		</FormPositions>
+	</TBcState>
+	<TDirCompareState>
+		<LeftMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\sonoflink"/>
+			<_1 Value="D:\Workspace\Projects\Unity\sonoflink\Assets"/>
+			<_2 Value="D:\Workspace\Projects\Unity"/>
+			<_3 Value="D:\Workspace\Projects"/>
+			<_4 Value="D:\Workspace"/>
+			<_5 Value="D:\"/>
+		</LeftMRUSpecs>
+		<LogHeight Value="0"/>
+		<MRUFilters>
+			<_0 Value="-.\DataPath\;-.\Library\;-.\LuaEncoder\;-.\luaProject\;-.\obj\;-.\Temp\"/>
+		</MRUFilters>
+		<RightMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK\Assets"/>
+			<_1 Value="D:\Workspace\Projects\Unity\trunk_ShareSDK"/>
+		</RightMRUSpecs>
+		<ShowToolbar Value="False"/>
+	</TDirCompareState>
+	<TDirFindState>
+		<FindItems>
+			<_0 Value="Setting"/>
+			<_1 Value="Custom"/>
+		</FindItems>
+	</TDirFindState>
+	<THexCompareState>
+		<LeftMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Scenes\main.unity"/>
+		</LeftMRUSpecs>
+		<MRUFonts>
+			<_0 Value="Consolas;10"/>
+		</MRUFonts>
+		<RightMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Scenes\main.unity"/>
+		</RightMRUSpecs>
+	</THexCompareState>
+	<THomeState>
+		<SessionType Value="TDirCompareSession"/>
+	</THomeState>
+	<TTextCompareState>
+		<LeftMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Framework\Lua\Logic\Game.lua"/>
+			<_1 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Framework\Lua\Logic\GameManager.lua"/>
+			<_2 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Framework\Lua\Logic\UI\PanelManager.lua"/>
+			<_3 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Scripts\Common\ResourcesPath.cs"/>
+			<_4 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Scripts\Common\ResourcesCenter.cs.meta"/>
+			<_5 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Scripts\Download\Editor\CreateAssetBundle.cs"/>
+			<_6 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Scripts\Download\Editor\Builder.cs"/>
+			<_7 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Framework\Scripts\Main.cs"/>
+			<_8 Value="D:\Workspace\Projects\Unity\OceanApp\Assets\Framework\Scripts\Manager\ResourceManager.cs"/>
+		</LeftMRUSpecs>
+		<MRUFonts>
+			<_0 Value="Consolas;10"/>
+		</MRUFonts>
+		<RightMRUSpecs>
+			<_0 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Framework\Lua\Logic\Game.lua"/>
+			<_1 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Framework\Lua\Logic\GameManager.lua"/>
+			<_2 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Framework\Lua\Logic\UI\PanelManager.lua"/>
+			<_3 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Scripts\Common\ResourcesPath.cs"/>
+			<_4 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Scripts\Common\ResourcesCenter.cs.meta"/>
+			<_5 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Scripts\Download\Editor\CreateAssetBundle.cs"/>
+			<_6 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Scripts\Download\Editor\Builder.cs"/>
+			<_7 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Framework\Scripts\Main.cs"/>
+			<_8 Value="D:\Workspace\Projects\Unity\BaseProject\BaseProject\Assets\Framework\Scripts\Manager\ResourceManager.cs"/>
+		</RightMRUSpecs>
+	</TTextCompareState>
+	<TTextFindState>
+		<FindItems>
+			<_0 Value="OnClickShareButton"/>
+		</FindItems>
+		<ReplaceItems>
+			<_0/>
+		</ReplaceItems>
+	</TTextFindState>
+</BCState>
