@@ -1,0 +1,73 @@
+name: Reusable Unity CI
+
+on:
+  workflow_call:
+    inputs:
+      project-path:
+        required: false
+        type: string
+        default: '.'
+      unity-version:
+        required: false
+        type: string
+        default: '2022.3.20f1'
+      target-platform:
+        required: true
+        type: string
+      run-tests:
+        required: false
+        type: boolean
+        default: true
+      artifact-name:
+        required: false
+        type: string
+        default: 'unity-build'
+    secrets:
+      UNITY_LICENSE:
+        required: false
+      UNITY_EMAIL:
+        required: false
+      UNITY_PASSWORD:
+        required: false
+
+jobs:
+  unity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: ${{ inputs.project-path }}/Library
+          key: Library-${{ runner.os }}-${{ inputs.target-platform }}-${{ hashFiles(format('{0}/Packages/manifest.json', inputs.project-path)) }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ inputs.target-platform }}-
+            Library-${{ runner.os }}-
+      - name: Unity tests
+        if: ${{ inputs.run-tests }}
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: ${{ inputs.project-path }}
+          unityVersion: ${{ inputs.unity-version }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Unity build
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: ${{ inputs.project-path }}
+          unityVersion: ${{ inputs.unity-version }}
+          targetPlatform: ${{ inputs.target-platform }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}-${{ inputs.target-platform }}
+          path: build
+          if-no-files-found: error
