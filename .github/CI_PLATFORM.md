@@ -12,7 +12,22 @@ This repository currently hosts the shared GitHub Actions workflows used by whic
 | `.github/workflows/reusable-docker.yml` | BuildKit build/cache and optional GHCR push |
 | `.github/workflows/reusable-unity.yml` | Unity Test Runner + Unity Builder + artifact upload |
 | `.github/workflows/reusable-3d-assets.yml` | Basic GLB/GLTF/OBJ/STL/PLY inventory and SHA-256 QA |
+| `.github/workflows/reusable-dotnet.yml` | .NET restore/build/test and optional artifacts |
+| `.github/workflows/reusable-cmake.yml` | CMake configure/build/CTest and optional artifacts |
 | `.github/workflows/reusable-release.yml` | Collect artifacts, SHA-256 and publish a tag release |
+
+## Current first integration
+
+`whichow/PrivacyCamera` is the first repository migrated to the shared platform. Its normal Android CI now calls `whichow/Tools/.github/workflows/reusable-android.yml@master` rather than duplicating setup/build/upload steps.
+
+The permanent Android release workflow is being hardened around these rules:
+
+- CI version inputs must be injected into the APK manifest rather than only used in the GitHub tag/title.
+- Release builds are treated as unsigned output first.
+- `zipalign` runs before signing.
+- The permanent keystore signs with `apksigner`.
+- `apksigner verify` and `aapt dump badging` verify signature plus versionName/versionCode.
+- GitHub Release publishing is a separate opt-in step; artifact-only verification remains possible.
 
 ## Android caller example
 
@@ -103,7 +118,8 @@ Apple release pipelines should keep certificates, App Store Connect credentials 
 4. OpenPuppet2D / Museverse — Web + Unity golden-pose/golden-image compatibility matrix.
 5. NovelForge / AgentOS / ModelBridge — Python/Docker tests, images and staged deployments.
 6. Offline Fig Viewer / VRM Studio / renderer tools — desktop matrix and render regression.
-7. AI Drama / OpenChatCut / AI Singer — deterministic media-pipeline QA, then optional GPU/provider smoke jobs.
+7. PcSentinel / KnowledgeHub / QuarkFind — .NET/CMake build matrices and performance gates.
+8. AI Drama / OpenChatCut / AI Singer — deterministic media-pipeline QA, then optional GPU/provider smoke jobs.
 
 ## CI policy
 
