@@ -1,0 +1,59 @@
+name: Reusable Web CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: false
+        type: string
+        default: '22'
+      working-directory:
+        required: false
+        type: string
+        default: '.'
+      install-command:
+        required: false
+        type: string
+        default: 'npm ci'
+      test-command:
+        required: false
+        type: string
+        default: 'npm test --if-present'
+      build-command:
+        required: false
+        type: string
+        default: 'npm run build --if-present'
+      artifact-path:
+        required: false
+        type: string
+        default: 'dist'
+      artifact-name:
+        required: false
+        type: string
+        default: 'web-build'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+      - name: Install
+        run: ${{ inputs.install-command }}
+      - name: Test
+        run: ${{ inputs.test-command }}
+      - name: Build
+        run: ${{ inputs.build-command }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles(format('{0}/{1}', inputs.working-directory, inputs.artifact-path)) != '' }}
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.artifact-path }}
+          if-no-files-found: ignore
