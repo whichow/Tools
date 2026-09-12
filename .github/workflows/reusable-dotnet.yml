@@ -1,0 +1,82 @@
+name: Reusable .NET CI
+
+on:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        required: false
+        type: string
+        default: '8.0.x'
+      working-directory:
+        required: false
+        type: string
+        default: '.'
+      project-or-solution:
+        required: false
+        type: string
+        default: ''
+      configuration:
+        required: false
+        type: string
+        default: 'Release'
+      test-arguments:
+        required: false
+        type: string
+        default: '--no-build'
+      artifact-path:
+        required: false
+        type: string
+        default: ''
+      artifact-name:
+        required: false
+        type: string
+        default: 'dotnet-artifacts'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Restore
+        shell: bash
+        run: |
+          TARGET='${{ inputs.project-or-solution }}'
+          if [ -n "$TARGET" ]; then dotnet restore "$TARGET"; else dotnet restore; fi
+
+      - name: Build
+        shell: bash
+        run: |
+          TARGET='${{ inputs.project-or-solution }}'
+          if [ -n "$TARGET" ]; then
+            dotnet build "$TARGET" --configuration '${{ inputs.configuration }}' --no-restore
+          else
+            dotnet build --configuration '${{ inputs.configuration }}' --no-restore
+          fi
+
+      - name: Test
+        shell: bash
+        run: |
+          TARGET='${{ inputs.project-or-solution }}'
+          if [ -n "$TARGET" ]; then
+            dotnet test "$TARGET" --configuration '${{ inputs.configuration }}' ${{ inputs.test-arguments }}
+          else
+            dotnet test --configuration '${{ inputs.configuration }}' ${{ inputs.test-arguments }}
+          fi
+
+      - name: Upload artifacts
+        if: ${{ inputs.artifact-path != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.artifact-path }}
+          if-no-files-found: error
