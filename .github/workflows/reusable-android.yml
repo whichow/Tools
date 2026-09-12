@@ -7,11 +7,23 @@ on:
         required: false
         type: string
         default: '17'
+      gradle-version:
+        required: false
+        type: string
+        default: '9.6.0'
+      use-wrapper:
+        required: false
+        type: boolean
+        default: true
       working-directory:
         required: false
         type: string
         default: '.'
-      gradle-task:
+      verify-command:
+        required: false
+        type: string
+        default: ''
+      gradle-arguments:
         required: false
         type: string
         default: 'assembleDebug'
@@ -19,46 +31,79 @@ on:
         required: false
         type: string
         default: 'android-build'
-    secrets:
-      ANDROID_KEYSTORE_BASE64:
+      retention-days:
         required: false
-      ANDROID_KEYSTORE_PASSWORD:
-        required: false
-      ANDROID_KEY_ALIAS:
-        required: false
-      ANDROID_KEY_PASSWORD:
-        required: false
+        type: number
+        default: 14
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup JDK
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: ${{ inputs.java-version }}
-          cache: gradle
-      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: ${{ inputs.gradle-version }}
+          cache-provider: basic
+
+      - name: Project verification
+        if: ${{ inputs.verify-command != '' }}
+        shell: bash
+        run: ${{ inputs.verify-command }}
+
       - name: Make Gradle wrapper executable
+        if: ${{ inputs.use-wrapper }}
+        shell: bash
         run: chmod +x ./gradlew
-      - name: Build
-        run: ./gradlew ${{ inputs.gradle-task }} --stacktrace
-      - name: Collect APK/AAB
+
+      - name: Build with Gradle wrapper
+        if: ${{ inputs.use-wrapper }}
+        shell: bash
+        run: ./gradlew --no-daemon ${{ inputs.gradle-arguments }} --stacktrace
+
+      - name: Build with installed Gradle
+        if: ${{ !inputs.use-wrapper }}
+        shell: bash
+        run: gradle --no-daemon ${{ inputs.gradle-arguments }} --stacktrace
+
+      - name: Collect APK/AAB and checksums
         shell: bash
         run: |
-          mkdir -p "$RUNNER_TEMP/android-artifacts"
-          find . -type f \( -name '*.apk' -o -name '*.aab' \) -print -exec cp {} "$RUNNER_TEMP/android-artifacts/" \;
-          if [ -z "$(find "$RUNNER_TEMP/android-artifacts" -type f -maxdepth 1)" ]; then
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/android-artifacts"
+          mkdir -p "$OUT"
+          while IFS= read -r -d '' file; do
+            rel="${file#./}"
+            safe="${rel//\//__}"
+            cp "$file" "$OUT/$safe"
+          done < <(find . -type f \( -name '*.apk' -o -name '*.aab' \) -print0)
+
+          if ! find "$OUT" -maxdepth 1 -type f \( -name '*.apk' -o -name '*.aab' \) | grep -q .; then
             echo 'No APK/AAB files found.'
             exit 1
           fi
-          (cd "$RUNNER_TEMP/android-artifacts" && sha256sum * > SHA256SUMS.txt)
-      - uses: actions/upload-artifact@v4
+
+          (cd "$OUT" && sha256sum -- *.apk *.aab 2>/dev/null | sort > SHA256SUMS.txt || true)
+          cat "$OUT/SHA256SUMS.txt"
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
           path: ${{ runner.temp }}/android-artifacts
           if-no-files-found: error
+          retention-days: ${{ inputs.retention-days }}
