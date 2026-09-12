@@ -1,0 +1,48 @@
+name: Reusable 3D Asset QA
+
+on:
+  workflow_call:
+    inputs:
+      asset-glob:
+        required: false
+        type: string
+        default: '**/*.{glb,gltf,obj,stl,ply}'
+      python-version:
+        required: false
+        type: string
+        default: '3.12'
+
+jobs:
+  validate-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Inventory 3D assets
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          exts={'.glb','.gltf','.obj','.stl','.ply'}
+          files=[p for p in Path('.').rglob('*') if p.is_file() and p.suffix.lower() in exts]
+          if not files:
+              raise SystemExit('No supported 3D assets found')
+          total=0
+          for p in sorted(files):
+              size=p.stat().st_size
+              total+=size
+              if size == 0:
+                  raise SystemExit(f'Empty asset: {p}')
+              print(f'{p}\t{size}')
+          print(f'asset_count={len(files)} total_bytes={total}')
+          PY
+      - name: Write checksums
+        shell: bash
+        run: |
+          find . -type f \( -name '*.glb' -o -name '*.gltf' -o -name '*.obj' -o -name '*.stl' -o -name '*.ply' \) -print0 | sort -z | xargs -0 sha256sum > 3D_ASSET_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 3d-asset-qa
+          path: 3D_ASSET_SHA256SUMS.txt
