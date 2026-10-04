@@ -1,0 +1,133 @@
+name: Temp Xiaohongshu Extract
+
+on:
+  push:
+    branches:
+      - chatgpt-xhs-3tnGelz8IX6-20261004
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Extract media
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          python - <<'PY'
+          import json, os, re, sys
+          from urllib.parse import urlencode, urlparse
+          from urllib.request import Request, urlopen
+
+          SHARE = "https://xhslink.cn/o/3tnGelz8IX6"
+          API = "https://ynvan.com"
+          UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
+
+          def fetch(url, timeout=90):
+              req = Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
+              with urlopen(req, timeout=timeout) as r:
+                  return r.read(), dict(r.headers)
+
+          parse_url = API + "/api/parse?" + urlencode({"url": SHARE})
+          body, _ = fetch(parse_url)
+          open("output/result.json", "wb").write(body)
+
+          obj = json.loads(body)
+          if obj.get("code") != 200 or not isinstance(obj.get("data"), dict):
+              print(json.dumps(obj, ensure_ascii=False, indent=2))
+              raise SystemExit("parse failed")
+
+          data = obj["data"]
+          sigs = data.get("sig") or {}
+          manifest = {
+              "input": SHARE,
+              "source": data.get("source"),
+              "title": data.get("title"),
+              "author": data.get("author"),
+              "duration": data.get("duration"),
+              "width": data.get("width"),
+              "height": data.get("height"),
+              "type": "video" if data.get("video_url") else ("image" if data.get("images") else "unknown"),
+              "downloads": [],
+          }
+
+          def guess_ext(url, kind):
+              p = urlparse(url).path.lower()
+              m = re.search(r"\.(mp4|mov|m4v|jpg|jpeg|png|webp|gif)(?:$|\?)", p)
+              if m:
+                  ext = m.group(1)
+                  return ".jpg" if ext == "jpeg" else "." + ext
+              return ".mp4" if kind in ("video", "live") else ".jpg"
+
+          def download_signed(url, filename, kind):
+              sig = sigs.get(url)
+              if sig:
+                  dl = API + "/api/proxy?" + urlencode({
+                      "url": url, "sig": sig, "filename": filename, "download": "1"
+                  })
+              else:
+                  dl = url
+              try:
+                  content, headers = fetch(dl, timeout=180)
+                  path = os.path.join("output", filename)
+                  open(path, "wb").write(content)
+                  manifest["downloads"].append({
+                      "kind": kind,
+                      "filename": path,
+                      "bytes": len(content),
+                      "content_type": headers.get("Content-Type"),
+                      "source_url": url,
+                      "via": "proxy" if sig else "direct",
+                  })
+                  print(f"downloaded {kind}: {filename} ({len(content)} bytes)")
+                  return True
+              except Exception as e:
+                  manifest["downloads"].append({
+                      "kind": kind, "filename": filename, "source_url": url, "error": repr(e)
+                  })
+                  print(f"FAILED {kind}: {url}: {e}", file=sys.stderr)
+                  return False
+
+          video_url = data.get("video_url")
+          if video_url:
+              download_signed(video_url, "video" + guess_ext(video_url, "video"), "video")
+
+          images = data.get("images") or []
+          for i, item in enumerate(images, 1):
+              if isinstance(item, str):
+                  image_url, live_url = item, None
+              else:
+                  image_url = item.get("url") or item.get("image_url")
+                  live_url = item.get("live_photo_url") or item.get("video_url")
+              if image_url:
+                  download_signed(image_url, f"image_{i:02d}" + guess_ext(image_url, "image"), "image")
+              if live_url:
+                  download_signed(live_url, f"live_{i:02d}" + guess_ext(live_url, "live"), "live")
+
+          # If video_url was absent, try the largest direct format as fallback.
+          if not video_url:
+              formats = [f for f in (data.get("formats") or []) if isinstance(f, dict) and f.get("url")]
+              formats.sort(key=lambda f: (f.get("filesize") or 0), reverse=True)
+              if formats:
+                  u = formats[0]["url"]
+                  download_signed(u, "video" + guess_ext(u, "video"), "video")
+
+          open("output/manifest.json", "w", encoding="utf-8").write(
+              json.dumps(manifest, ensure_ascii=False, indent=2)
+          )
+          print(json.dumps(manifest, ensure_ascii=False, indent=2))
+          if not any(d.get("bytes") for d in manifest["downloads"]):
+              raise SystemExit("no media downloaded")
+          PY
+
+      - name: Upload extracted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: xiaohongshu-3tnGelz8IX6
+          path: output/
+          if-no-files-found: error
+          retention-days: 1
