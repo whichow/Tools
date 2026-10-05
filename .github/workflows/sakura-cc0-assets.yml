@@ -1,0 +1,45 @@
+name: Sakura CC0 Materials
+on:
+  push:
+    branches: [sakura-river-rebuild-20261005]
+    paths: ['.github/workflows/sakura-cc0-assets.yml']
+permissions:
+  contents: read
+jobs:
+  materials:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Retrieve declared CC0 image assets
+        run: |
+          mkdir -p output/assets
+          python - <<'PY'
+          import urllib.request,re,json,pathlib,concurrent.futures
+          from urllib.parse import urljoin
+          base='https://valley.mengto.here.now/'
+          html=urllib.request.urlopen(base,timeout=30).read().decode()
+          script=re.findall(r'<script[^>]+src="([^"]+)"',html)[-1]
+          js=urllib.request.urlopen(urljoin(base,script),timeout=30).read().decode()
+          # Only extract material URLs; the application code is not redistributed.
+          paths=sorted(set(re.findall(r'[\"\x27`]([^\"\x27`\s]+\.(?:jpg|jpeg|png|webp|glb))[\"\x27`]',js)))
+          pathlib.Path('output/asset-paths.json').write_text(json.dumps(paths,indent=2))
+          names=['sakura','pine_bark','lichen','ground','pebble','stone_wall','weathered','rock_moss']
+          eligible=[p for p in paths if any(x in p.lower() for x in names) and not p.lower().endswith('.glb')]
+          def get(p):
+              try:
+                  b=urllib.request.urlopen(urljoin(base,p),timeout=45).read()
+                  name=p.rsplit('/',1)[-1]
+                  if len(b)<6000000:
+                      pathlib.Path('output/assets',name).write_bytes(b)
+                      return {'path':p,'file':name,'bytes':len(b),'license':'CC0','attribution':'Poly Haven, as declared by reference page'}
+              except Exception as e:return {'path':p,'error':str(e)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              result=list(pool.map(get,eligible[:32]))
+          pathlib.Path('output/material-manifest.json').write_text(json.dumps(result,indent=2))
+          print(json.dumps({'paths':paths,'downloaded':result},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sakura-cc0-materials
+          path: output/
+          retention-days: 3
