@@ -14,31 +14,41 @@ jobs:
         run: |
           mkdir -p output/assets
           python - <<'PY'
-          import urllib.request,re,json,pathlib,concurrent.futures
+          import re,json,pathlib,concurrent.futures,subprocess
           from urllib.parse import urljoin
+          def fetch(u):return subprocess.check_output(['curl','-fLsS','--max-time','45',u])
           base='https://valley.mengto.here.now/'
-          html=urllib.request.urlopen(base,timeout=30).read().decode()
-          script=re.findall(r'<script[^>]+src="([^"]+)"',html)[-1]
-          js=urllib.request.urlopen(urljoin(base,script),timeout=30).read().decode()
-          # Only extract material URLs; the application code is not redistributed.
-          paths=sorted(set(re.findall(r'[\"\x27`]([^\"\x27`\s]+\.(?:jpg|jpeg|png|webp|glb))[\"\x27`]',js)))
+          paths=[]
+          try:
+              html=fetch(base).decode()
+              script=re.findall(r'<script[^>]+src="([^"]+)"',html)[-1]
+              js=fetch(urljoin(base,script)).decode()
+              paths=sorted(set(re.findall(r'[\"\x27`]([^\"\x27`\s]+\.(?:jpg|jpeg|png|webp|glb))[\"\x27`]',js)))
+          except Exception as e:print('reference:',e)
           pathlib.Path('output/asset-paths.json').write_text(json.dumps(paths,indent=2))
           names=['sakura','pine_bark','lichen','ground','pebble','stone_wall','weathered','rock_moss']
-          eligible=[p for p in paths if any(x in p.lower() for x in names) and not p.lower().endswith('.glb')]
+          eligible=[urljoin(base,p) for p in paths if any(x in p.lower() for x in names) and not p.lower().endswith('.glb')]
+          if not eligible:
+              for name in ['sakura_bark','pine_bark','lichen_rock','forrest_ground_01','ganges_river_pebbles','weathered_planks']:
+                  try:
+                      d=json.loads(fetch('https://api.polyhaven.com/files/'+name))
+                      for typ in ['diff','nor_gl']:
+                          if typ in d and '1k' in d[typ] and 'jpg' in d[typ]['1k']:eligible.append(d[typ]['1k']['jpg']['url'])
+                  except Exception as e:print(name,e)
           def get(p):
               try:
-                  b=urllib.request.urlopen(urljoin(base,p),timeout=45).read()
+                  b=fetch(p)
                   name=p.rsplit('/',1)[-1]
                   if len(b)<6000000:
                       pathlib.Path('output/assets',name).write_bytes(b)
-                      return {'path':p,'file':name,'bytes':len(b),'license':'CC0','attribution':'Poly Haven, as declared by reference page'}
+                      return {'path':p,'file':name,'bytes':len(b),'license':'CC0','attribution':'Poly Haven'}
               except Exception as e:return {'path':p,'error':str(e)}
-          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-              result=list(pool.map(get,eligible[:32]))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:result=list(pool.map(get,eligible[:32]))
           pathlib.Path('output/material-manifest.json').write_text(json.dumps(result,indent=2))
           print(json.dumps({'paths':paths,'downloaded':result},indent=2))
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: sakura-cc0-materials
           path: output/
