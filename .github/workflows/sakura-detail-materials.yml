@@ -1,0 +1,24 @@
+name: Sakura Detail Materials
+on:
+  push:
+    branches: [sakura-river-rebuild-20261005]
+    paths: ['.github/workflows/sakura-detail-materials.yml']
+permissions:
+  contents: read
+jobs:
+  details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Download CC0 material maps
+        run: |
+          mkdir -p output
+          curl -fLsS --max-time 30 'https://valley.mengto.here.now/assets/reed_roof_04_c-QLC7LGOL.webp' -o output/reed_roof_04_c.webp
+          curl -fLsS --max-time 30 'https://valley.mengto.here.now/assets/reed_roof_04_n-YUYFE46L.webp' -o output/reed_roof_04_n.webp
+          curl -fLsS --max-time 30 'https://valley.mengto.here.now/assets/brown_planks_09_c-65QOALTD.webp' -o output/brown_planks_09_c.webp
+          curl -fLsS --max-time 30 'https://valley.mengto.here.now/assets/brown_planks_09_n-Y2IMNPUN.webp' -o output/brown_planks_09_n.webp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sakura-detail-materials
+          path: output/
+          retention-days: 3
